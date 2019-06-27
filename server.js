@@ -1,13 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 var server = express();
 var port= process.env.PORT || 3000;
 
 //Data
-var data = require( "./data.js");
-
-
+var postsModel = require("./schema.js");
 
 //Middleware
 server.use(express.urlencoded( {
@@ -20,24 +19,43 @@ server.use (express.json());
 //REST endpoints
 
 server.get("/posts", function (req,res) {
-    var response = {posts : data.posts};
-    res.json(response);
+    postsModel.find().then(function(posts) {
+        var response = { posts: posts};
+        res.json(response);
+    }).catch(function(error) {
+        var response = { msg: error.message };
+        res.status(400);
+        res.json(response);
+    }); //gotta do a .catch you just gotta and it'll usually look like this
+
+    // var response = {posts : data.posts};
+    // res.json(response);
 });
+    
 server.post("/posts", function (req, res) {
-    var new_post = {
+     postsModel.create({
         title: req.body.title,
         author: req.body.author,
         category: req.body.category,
+        // skip the date field and use the default (the new Date)
         image: req.body.image,
-        text: req.body.text,
-        date: req.body.date
-    };
-    data.posts.unshift(new_post);
-	res.status(201);
-	res.send();
+        text: req.body.text
+    }).then(function (new_post) {
+        res.status(201);
+        res.json(new_post);
+    }).catch(function(error) {
+        // if anything went wrong above, we catch the error here
+        var response = { msg: error.message };
+        res.status(400);
+        res.json(response);
+    });
 });
 
 
-server.listen(port, function() {
-	console.log(`Listening on port ${port}`)
+mongoose.connect("mongodb+srv://DataBaseUser:UserofDBs@mydatabase-rzgbu.mongodb.net/test?retryWrites=true&w=majority", { // test will specify which database it will connect to within the cluster
+    useNewUrlParser: true
+}).then(function() {
+    server.listen(port, function() {
+	    console.log(`Listening on port ${port}`)
+    });
 });
