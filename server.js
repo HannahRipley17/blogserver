@@ -20,6 +20,8 @@ server.use (express.json());
 
 server.get("/posts", function (req,res) {
     postsModel.find().then(function(posts) {
+        // var reversed_list = [];
+        // posts.forEach(function(post))
         var response = { posts: posts};
         res.json(response);
     }).catch(function(error) {
@@ -51,6 +53,17 @@ server.post("/posts", function (req, res) {
     });
 });
 
+//DELETE /posts/id
+server.delete("/posts/:id", function(req,res) {
+    postsModel.findByIdAndDelete(req.params.id).then(function() {
+        res.status(204);
+        res.send();
+    }).catch(function(error) {
+        var response = { msg: error.message };
+        res.status(400);
+        res.json(response);
+    });
+});
 
 mongoose.connect("mongodb+srv://DataBaseUser:UserofDBs@mydatabase-rzgbu.mongodb.net/test?retryWrites=true&w=majority", { // test will specify which database it will connect to within the cluster
     useNewUrlParser: true
