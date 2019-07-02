@@ -65,6 +65,34 @@ server.delete("/posts/:id", function(req,res) {
     });
 });
 
+server.get("/posts/:id", function(req,res) {
+    postsModel.findById(req.params.id).then(function(post) {
+        if (post == null) {
+            res.status(404);
+            res.json({msg: `idk what you want`})
+        } else {
+            res.json({post:post})
+        }
+    }).catch(function(error) {
+        res.status(400).json({msg: error.message});
+    });
+});
+
+//update posts/id
+server.put("/posts/:id", function(req,res) {
+    postsModel.findById(req.params.id).then(function(post) {
+        post.title = req.body.title;
+        post.author = req.body.author;
+        post.category = req.body.category;
+        post.text = req.body.text;
+        post.save().then(function() {
+            res.status(200);
+            res.json({post:post})
+        });
+    });
+});
+
+
 mongoose.connect("mongodb+srv://DataBaseUser:UserofDBs@mydatabase-rzgbu.mongodb.net/test?retryWrites=true&w=majority", { // test will specify which database it will connect to within the cluster
     useNewUrlParser: true
 }).then(function() {

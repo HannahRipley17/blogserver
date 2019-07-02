@@ -4,20 +4,20 @@ const mongoose = require("mongoose");
 const postSchema = mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: false,
     },
     author: {
         type: String,
-        required: true,
+        required: false,
     },
     category: {
         type: String,
-        required: true,
+        required: false,
         default: "all",
     },
     date: {
         type: String,
-        required: true,
+        required: false,
         default: new Date().toDateString()
     },
     image: {
